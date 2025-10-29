@@ -1,24 +1,32 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-import time
+import asyncio
+import logging
+from telethon import TelegramClient
+from tg import setup_handlers
+from params import API_ID, API_HASH, BOT_TOKEN
 
-LOGIN = "roman1"
-PASSWORD = "Romka1234"
 
-driver = webdriver.Chrome()
+def configure_logging():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s | %(name)s | %(levelname)s | %(message)s",
+    )
+    logging.getLogger("telethon").setLevel(logging.WARNING)
+    logging.getLogger("asyncio").setLevel(logging.WARNING)
 
-try:
-    driver.get("https://forum.optina.ru/login/")
-    time.sleep(2)
 
-    username_field = driver.find_element(By.ID, "auth")
-    password_field = driver.find_element(By.ID, "password")
+async def main():
+    configure_logging()
+    logger = logging.getLogger("main")
+    logger.info("Запускаем бота")
 
-    username_field.send_keys(LOGIN)
-    password_field.send_keys(PASSWORD)
+    client = TelegramClient('bot_session', API_ID, API_HASH)
+    await client.start(bot_token=BOT_TOKEN)
 
-    login_button = driver.find_element(By.ID, "elSignIn_submit")
-    login_button.click()
+    await setup_handlers(client)
 
-finally:
-    driver.quit()
+    logger.info("бот запущен")
+    await client.run_until_disconnected()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
