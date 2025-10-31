@@ -29,4 +29,9 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logging.info('Программа остановлена')
+    except Exception as e:
+        logging.error(f'Ошибка при запуске: {e}')
